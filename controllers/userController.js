@@ -1,8 +1,9 @@
 const User = require('../models/user');
 const { validationResult } = require('express-validator');
-
+const jwt = require('jsonwebtoken');
+const config = require('../config/index');
 exports.index = (req, res, next) => {
-    res.status(200).json({message : "act"});
+    return res.status(200).json({message : "act"});
 }
 exports.register =async (req, res, next) => {
     try{
@@ -29,7 +30,7 @@ exports.register =async (req, res, next) => {
         user.email = email;
         user.password = await user.encryPassword(password);
         await user.save();
-        res.status(201).json({message : "registed"});
+        return res.status(201).json({message : "registed"});
     }catch(error){
         next(error);
     }
@@ -52,7 +53,22 @@ exports.login =async (req, res, next) => {
             error.statusCode = 401;
             throw error;
         }
-        res.status(200).json({message : "login success"});
+
+        //create token
+        const token = await jwt.sign({
+            id : user._id,
+            role : user.role
+        }, config.JWT_SECRET, { expiresIn : '2 days' });
+
+        //decode expiresIn
+        const expires_in = jwt.decode(token);
+
+        return res.status(200).json({
+            message : "login success",
+            access_token : token,
+            expires_in : expires_in.exp,
+            token_type : 'Bearer'
+        });
     }catch(error){
         next(error);
     }
