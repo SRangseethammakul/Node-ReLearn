@@ -41,9 +41,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/user', usersRouter);
-app.use('/company',[passportJWT.isLogin], companyRouter);
+app.use('/company', companyRouter);
 app.use('/staff', staffRouter);
-app.use('/shop', shopRouter);
+app.use('/shop',[passportJWT.isLogin], shopRouter);
 
 app.use(errorHandler);
 
