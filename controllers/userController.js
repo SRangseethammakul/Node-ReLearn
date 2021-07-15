@@ -73,3 +73,15 @@ exports.login =async (req, res, next) => {
         next(error);
     }
 }
+
+exports.me = (req, res, next) => {
+    const {_id, name, email, role} = req.user;
+    return res.status(200).json({
+        user : {
+            id : _id,
+            name : name,
+            email : email,
+            role : role
+        }
+    });
+}

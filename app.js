@@ -3,8 +3,11 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mongoose = require('mongoose');
+const passport = require('passport');
 
 const config = require('./config/index');
+
+
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
@@ -14,10 +17,11 @@ const shopRouter = require('./routes/shop');
 
 //import middleware
 const errorHandler = require('./middleware/errorHandler');
-
-
-
+const passportJWT = require('./middleware/passportJWT');
 const app = express();
+
+//init passport
+app.use(passport.initialize());
 
 mongoose.connect(config.MONGODB_URI, {
     useNewUrlParser: true,
@@ -37,7 +41,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/user', usersRouter);
-app.use('/company', companyRouter);
+app.use('/company',[passportJWT.isLogin], companyRouter);
 app.use('/staff', staffRouter);
 app.use('/shop', shopRouter);
 
